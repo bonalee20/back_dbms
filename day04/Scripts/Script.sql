@@ -1,0 +1,422 @@
+UPDATE TBL_PRODUCT
+SET PRODUCT_STOCK = 100
+WHERE ID = 2;
+
+SELECT * FROM TBL_PRODUCT;
+
+DELETE FROM TBL_PRODUCT
+WHERE ID = 5;
+
+
+-- 정렬(마지막)
+-- ORDER BY 컬럼명 ASC: 오름차순
+-- ORDER BY 컬럼명 DESC: 내림차순
+-- 오름차순(default)
+SELECT *
+FROM TBL_PRODUCT
+WHERE PRODUCT_NAME = '배승원의 그램'
+ORDER BY ID DESC;
+
+-- ======================================================================
+-- 서브 쿼리(SUB QUERY)
+-- 평균 가격보다 가격이 낮은 상품의 ID를 조회
+-- WHERE: SUB QUERY
+-- SELECT: SCALAR
+-- FROM: IN LINE VEIW
+ 
+SELECT *
+FROM TBL_PRODUCT
+WHERE PRODUCT_PRICE < (
+   SELECT AVG(PRODUCT_PRICE) 
+   FROM TBL_PRODUCT
+);
+
+-- 평균 재고보다 큰 상품을 조회
+
+SELECT * 
+FROM TBL_PRODUCT
+WHERE PRODUCT_STOCK > (
+   SELECT AVG(PRODUCT_STOCK)
+   FROM TBL_PRODUCT
+)
+ORDER BY ID DESC;
+
+-- FROM
+-- 재고가 20개인 상품의 평균 가격
+SELECT AVG(PRODUCT_PRICE)
+FROM (
+   SELECT * 
+   FROM TBL_PRODUCT
+   WHERE PRODUCT_STOCK = 20
+);
+
+-- SELECT
+SELECT TP.PRODUCT_NAME, (
+   SELECT AVG(PRODUCT_PRICE)
+   FROM (
+      SELECT * 
+      FROM TBL_PRODUCT
+      WHERE PRODUCT_STOCK = 20
+   )
+)
+FROM TBL_PRODUCT TP;
+
+
+-- 사용자가 게시판에 글을 작성
+CREATE SEQUENCE SEQ_USER;
+CREATE TABLE TBL_USER(
+   ID NUMBER CONSTRAINT PK_USER PRIMARY KEY,
+   USER_EMAIL VARCHAR2(255) NOT NULL UNIQUE,
+   USER_PASSWORD VARCHAR2(255) NOT NULL,
+   USER_ADDRESS VARCHAR2(255),
+   USER_BIRTH DATE
+);
+
+
+
+CREATE SEQUENCE SEQ_POST;
+CREATE TABLE TBL_POST(
+   ID NUMBER CONSTRAINT PK_POST PRIMARY KEY,
+   POST_TITLE VARCHAR2(255),
+   POST_CONTENT VARCHAR2(255),
+   USER_ID NUMBER,
+    CONSTRAINT FK_POST_USER FOREIGN KEY(USER_ID)
+   REFERENCES TBL_USER(ID)
+);
+
+-- 댓글
+CREATE SEQUENCE SEQ_REPLY;
+CREATE TABLE TBL_REPLY(
+   ID NUMBER CONSTRAINT PK_REPLY PRIMARY KEY,
+   REPLY_CONTENT VARCHAR2(255),
+   USER_ID NUMBER,
+   POST_ID NUMBER,
+   CONSTRAINT FK_REPLY_USER FOREIGN KEY(USER_ID)
+   REFERENCES TBL_USER(ID),
+   CONSTRAINT FK_REPLY_POST FOREIGN KEY(POST_ID)
+   REFERENCES TBL_POST(ID)
+);
+
+INSERT INTO TBL_USER
+VALUES(SEQ_USER.NEXTVAL, 'hgd1234@gmail.com', '1234', '서울시 강남구', '2002-07-15');
+INSERT INTO TBL_USER
+VALUES(SEQ_USER.NEXTVAL, 'jbg1234@gmail.com', '1234', '경기도 성남시', '1995-01-23');
+INSERT INTO TBL_USER
+VALUES(SEQ_USER.NEXTVAL, 'lss1234@gmail.com', '1234', '수원시 팔달구', '1998-03-01');
+INSERT INTO TBL_USER
+VALUES(SEQ_USER.NEXTVAL, 'kyh1234@naver.com', '1234', '서울시 마포구', '2002-07-15');
+INSERT INTO TBL_USER
+VALUES(SEQ_USER.NEXTVAL, 'kcs1234@naver.com', '1234', '서울시 동작구', '1992-03-30');
+INSERT INTO TBL_USER
+VALUES(SEQ_USER.NEXTVAL, 'cjs1234@gmail.com', '1234', '화성시 동탄', '2002-02-18');
+
+INSERT INTO TBL_POST
+VALUES(SEQ_POST.NEXTVAL, '이승찬 맥북 갔다버려!', '컴퓨터는 역시 그램', 1);
+INSERT INTO TBL_POST
+VALUES(SEQ_POST.NEXTVAL, '배승원 카드놀이 좀 그만해', '알탭 천재 배승원', 2);
+INSERT INTO TBL_POST
+VALUES(SEQ_POST.NEXTVAL, '마우스 뭐가 좋아요?', '마우스가 고장났는데, 새로 사고싶어요.', 3);
+INSERT INTO TBL_POST
+VALUES(SEQ_POST.NEXTVAL, '100만원으로 살 수 있는 컴퓨터 추천 좀..', '기존의 컴퓨터 고장났어요.', 5);
+INSERT INTO TBL_POST
+VALUES(SEQ_POST.NEXTVAL, '아직 다 못썼어요.', '제가 안썼어요! 저는 몰라요!', 2);
+INSERT INTO TBL_POST
+VALUES(SEQ_POST.NEXTVAL, '레전드 네버다이', '나는야 페이커', 1);
+
+-- 댓글
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '한민이형 감히', 6, 1);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '한민이형 넌 별것도 아니야', 6, 3);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '한민이형은 나의 도구', 6, 4);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '한민이형 밥 좀 사줘요.', 6, 5);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '그램보단 콩순이', 2, 1);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '갤럭시 북 세일할 때 사세요~', 1, 4);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '와 진짜 저건 저항받겠다. 인성 ㄷㄷ', 3, 2);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '맥북 에어 사세요^_^', 4, 4);
+INSERT INTO TBL_REPLY
+VALUES(SEQ_REPLY.NEXTVAL, '한민이형 질문 좀 해도 될까요?', 6, 1);
+
+SELECT * FROM TBL_USER; -- 6
+SELECT * FROM TBL_POST; -- 6
+SELECT * FROM TBL_REPLY; -- 9
+
+
+-- 6번 사용자가 댓글을 단 게시글의 목록
+SELECT * 
+FROM TBL_POST
+WHERE ID IN (
+   SELECT POST_ID
+   FROM TBL_REPLY
+   WHERE USER_ID = 6
+);
+
+-- 댓글을 단 사용자의 ID와 ADDRESS 조회
+SELECT ID AS "댓글 단 아이디", USER_ADDRESS AS "주소"
+FROM TBL_USER
+WHERE ID IN (
+   SELECT USER_ID
+   FROM TBL_REPLY
+);
+
+-- DISTINCT 중복 삭제
+SELECT DISTINCT USER_ID
+FROM TBL_REPLY;
+
+-- 댓글을 가장 많이 단 사용자 조회
+-- 2DEPTH
+SELECT * FROM TBL_USER
+WHERE ID = (
+   SELECT USER_ID
+   FROM TBL_REPLY
+   GROUP BY USER_ID
+   HAVING COUNT(USER_ID) = (
+      SELECT MAX(COUNT(USER_ID))
+      FROM TBL_REPLY
+      GROUP BY USER_ID
+   )
+);
+   
+-- 댓글이 가장 많이 달린 인기 게시글 조회
+-- ROWNUM 행 번호를 가져옴
+-- 2개 행
+
+
+SELECT *
+FROM TBL_POST
+WHERE ID IN (
+   SELECT POST_ID
+   FROM (
+      SELECT POST_ID
+      FROM TBL_REPLY
+      GROUP BY POST_ID
+      ORDER BY COUNT(POST_ID) DESC
+   )
+   WHERE ROWNUM <= 2
+);
+
+   
+-- 댓글과 게시글을 둘 다 작성한 유저 조회
+-- 게시글에서 댓글과 같은 유저
+SELECT USER_ID 
+FROM TBL_POST
+WHERE ID IN (
+	SELECT USER_ID 
+	FROM TBL_REPLY
+);
+
+-- 게시글에서 댓글과 같은 유저
+SELECT *
+FROM TBL_USER
+WHERE ID IN (
+	SELECT ID AS "댓글 단 유저"
+	FROM TBL_REPLY
+	WHERE ID IN (
+		SELECT USER_ID 
+		FROM TBL_POST
+	)
+);
+
+
+
+
+--강사님
+SELECT *
+FROM TBL_USER
+WHERE ID IN (
+	SELECT USER_ID AS "댓글 단 유저"
+	FROM TBL_REPLY
+	)
+	AND ID IN
+	(	
+	SELECT USER_ID AS "게시글 단 유저"
+	FROM TBL_POST
+	);
+
+
+-- 1) 제목에 맥북을 포함하고 있는 게시글에 달린 댓글 조회
+
+--제목에 맥북이 포함하고 있는 게시글에 
+SELECT *
+FROM TBL_POST
+WHERE POST_TITLE LIKE '%맥북%';
+--댓글에 조회
+SELECT *
+FROM TBL_REPLY
+WHERE POST_ID IN (
+	SELECT ID 
+	FROM TBL_POST
+	WHERE POST_TITLE LIKE '%맥북%');
+
+-- 2) 내용에 컴퓨터를 포함하고 있는 글을 작성한 유저의 이메일
+--내용에 컴퓨터를 포함하고 있는 글 -> 유저아이디
+SELECT *
+FROM TBL_POST
+WHERE POST_CONTENT LIKE '%컴퓨터%';
+--을 작성한 유저의 이메일
+SELECT USER_EMAIL 
+FROM TBL_USER
+WHERE ID IN (
+	SELECT USER_ID
+	FROM TBL_POST
+	WHERE POST_CONTENT LIKE '%컴퓨터%');
+
+
+-- 3) 내용에 고장을 포함하고 있는 글에 댓글을 작성한 유저 조회
+--  내용에 고장을 포함하고 있는 글 -> 아이디를 가지고 온다
+SELECT *
+FROM TBL_POST
+WHERE POST_CONTENT LIKE '%고장%';
+--  댓글을 작성한 -> 유저 아이ㄷㅣ,
+SELECT USER_ID 
+FROM TBL_REPLY
+WHERE ID IN (
+	SELECT POST_ID 
+	FROM TBL_POST
+	WHERE POST_CONTENT LIKE '%고장%'
+);
+
+-- 유저 조회
+
+SELECT *
+FROM TBL_USER
+WHERE ID IN (
+	SELECT USER_ID 
+	FROM TBL_REPLY
+	WHERE ID IN (
+		SELECT POST_ID 
+		FROM TBL_POST
+		WHERE POST_CONTENT LIKE '%고장%'
+	)
+);
+
+
+-- 4) 경기도에 거주하면서 댓글을 단 사용자 조회
+-- 경기도 거주
+SELECT *
+FROM TBL_USER
+WHERE USER_ADDRESS LIKE '경기도%' AND ID IN (
+	SELECT USER_ID
+	FROM TBL_REPLY
+);
+
+
+-- 5) 가장 나이가 어린 사용자가 작성한 게시글들 조회, ROWNUM
+--가장 나이가 어린 사용자
+SELECT *
+FROM TBL_USER
+ORDER BY USER_BIRTH DESC;--오름차순 = 나이가 많은 순
+
+SELECT *
+FROM (
+	SELECT *
+	FROM TBL_USER
+	ORDER BY USER_BIRTH DESC
+)WHERE ROWNUM <= 3;
+
+--
+SELECT * 
+FROM TBL_POST
+WHERE USER_ID IN (
+   SELECT ID
+   FROM (
+      SELECT * 
+      FROM TBL_USER
+      ORDER BY USER_BIRTH DESC
+   )
+   WHERE ROWNUM <= 3
+);
+
+
+
+-- 6) 서울에 살고 있는 인원 수에 해당하는 번호에 게시글 조회
+	--  서울에 살고 있는 인원 수
+SELECT COUNT(ID) 
+FROM TBL_USER
+WHERE USER_ADDRESS LIKE '%서울%';
+	--  번호에 게시글 조회
+SELECT *
+FROM TBL_POST
+WHERE ID = (
+	SELECT COUNT(ID) 
+	FROM TBL_USER
+	WHERE USER_ADDRESS LIKE '%서울%'
+);
+
+-- 7) 주소가 '구'로 끝나는 유저가 작성한 게시글에 달린 모든 댓글들 조회
+--    주소가 '구'로 끝나는 유저 -> 아이디
+SELECT *
+FROM TBL_USER
+WHERE USER_ADDRESS LIKE '%구';
+
+--    유저가 작성한 게시글 -> 게시글 아이디
+SELECT *
+FROM TBL_POST
+WHERE USER_ID IN (
+	SELECT ID 
+	FROM TBL_USER
+	WHERE USER_ADDRESS LIKE '%구'
+);
+
+--   작성한 게시글에 달린 모든 댓글들 조회
+SELECT *
+FROM TBL_REPLY
+WHERE POST_ID IN (
+	SELECT ID
+	FROM TBL_POST
+	WHERE USER_ID IN (
+		SELECT ID 
+		FROM TBL_USER
+		WHERE USER_ADDRESS LIKE '%구'
+	)
+);
+
+
+-- 8) 댓글에 '한민'이가 포함된 게시글에 달린 모든 댓글 조회
+-- 댓글에 '한민'
+SELECT *
+FROM TBL_REPLY
+WHERE REPLY_CONTENT LIKE '%한민%';
+-- 포함된 게시글
+SELECT ID 
+FROM TBL_POST
+WHERE ID IN (
+	SELECT POST_ID
+	FROM TBL_REPLY
+	WHERE REPLY_CONTENT LIKE '%한민%'
+);
+-- 달린 모든 댓글 조회
+SELECT *
+FROM TBL_REPLY
+WHERE POST_ID IN(
+	SELECT ID 
+	FROM TBL_POST
+	WHERE ID IN (
+		SELECT POST_ID
+		FROM TBL_REPLY
+		WHERE REPLY_CONTENT LIKE '%한민%'
+)
+);
+
+-- 9) 평균 댓글 개수보다 많이 달린 게시글을 작성한 유저
+
+
+-- 10) 가장 댓글을 적게 작성한 유저가 작성한 게시글
+
+
+
+
+
+
+
+
+
+
+
+
