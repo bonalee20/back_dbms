@@ -57,35 +57,117 @@ CREATE TABLE TBL_FORM(
 );
 
 
---=================================================================================================================================
 
+
+
+--=================================================================================================================================
 /*
 	요구사항
-	음료수 판매 업체입니다. 음료수마다 당첨번호가 있습니다. 
-	음료수의 당첨번호는 1개이고 당첨자의 정보를 알아야 상품을 배송할 수 있습니다.
-	당첨 번호마다 당첨 상품이 있고, 당첨 상품이 배송 중인지 배송 완료인지 구분해야 합니다.
+	유치원을 하려고 하는데, 아이들이 체험학습 프로그램을 신청해야 합니다.
+	아이들 정보는 이름, 나이, 성별이 필요하고 학부모는 이름, 나이, 주소, 전화번호, 성별이 필요해요
+	체험학습은 체험학습 제목, 체험학습 내용, 이벤트 이미지 여러 장이 필요합니다.
+	아이들은 여러 번 체험학습에 등록할 수 있어요.
+	아이-
+	학부모 - 둘 아이 키
+	체험학습 
+	이미지 - 체험학습 아이디
+	신청 - 체험 아이
 */
 
+CREATE SEQUENCE SEQ_CHILD;
+CREATE TABLE TBL_CHILD(
+	ID NUMBER CONSTRAINT PK_CHILD PRIMARY KEY,
+	CHILD_NAME VARCHAR2(225) NOT NULL
+);
+
+CREATE SEQUENCE SEQ_PARENT;
+CREATE TABLE TBL_PARENT(
+	ID NUMBER CONSTRAINT PK_PARENT PRIMARY KEY,
+	PARENT_GENDER CHAR(10),
+	CHILD_ID NUMBER,
+	CONSTRAINT GENDER_BAN CHECK(PARENT_GENDER IN ('남','여')),
+	CONSTRAINT FK_PARENT_CHILD FOREIGN KEY(CHILD_ID)
+	REFERENCES TBL_CHILD(ID)
+	);
+
+CREATE SEQUENCE SEQ_TRIP;
+CREATE TABLE TBL_TRIP(
+	ID NUMBER CONSTRAINT PK_TRIP PRIMARY KEY,
+	TRIP_TITLE VARCHAR2(225),
+	CONSTRAINT TITLE_BAN CHECK(TRIP_TITLE IN('숲속', '바다'))
+);
 
 
+CREATE SEQUENCE SEQ_IMAGE;
+CREATE TABLE TBL_IMAGE(
+	ID NUMBER CONSTRAINT PK_IMAGE PRIMARY KEY,
+	IMAGE_PATH VARCHAR2(225) NOT NULL,
+	IMAGE_NAME VARCHAR2(225) NOT NULL
+	TRIP_ID NUMBER,
+	CONSTRAINT FK_IMAGE_TRIP FOREIGN KEY(TRIP_ID)
+	REFERENCES TBL_TRIP(ID)
+);
 
 
+/*
+
+	요구사항
+	안녕하세요, 광고 회사를 운영하려고 준비중인 사업가입니다.
+	광고주는 기업이고 기업 정보는 이름, 주소, 대표번호, 기업종류(스타트업, 중소기업, 중견기업, 대기업)입니다.
+	광고는 제목, 내용이 있고 기업은 여러 광고를 신청할 수 있습니다.
+	기업이 광고를 선택할 때에는 카테고리로 선택하며, 대카테고리, 중카테고리, 소카테고리가 있습니다.
+	
+	기업 
+	광고
+	대 - 광고 아이디
+	중 - 대 아이디
+	소 - 중 아이디
+	신청 - 기업 광고 아이디
+*/
+
+CREATE SEQUENCE SEQ_COMPANY;
+CREATE TABLE TBL_COMPANY(
+	ID NUMBER CONSTRAINT PK_COMANY PRIMARY KEY,
+	COMPANY_NAME VARCHAR2(225) NOT NULL UNIQUE,
+	COMPANY_TYPE VARCHAR2(100) NOT NULL,
+	CONSTRAINT TYPE_BAN CHECK(COMPANY_TYPE IN ('스타트업', '중'))
+);
 
 
+CREATE SEQUENCE SEQ_AD;
+CREATE TABLE TBL_AD(
+	ID NUMBER CONSTRAINT PK_AD PRIMARY KEY,
+	AD_TITLE VARCHAR2(225)
+);
 
 
+CREATE SEQUENCE SEQ_BIG;
+CREATE TABLE TBL_BIG(
+	ID NUMBER CONSTRAINT PK_BIG PRIMARY KEY,
+	BIG_NAME VARCHAR2(225),
+	AD_ID NUMBER,
+	CONSTRAINT FK_BIG_AD FOREIGN KEY 
+);
 
 
+CREATE SEQUENCE SEQ_MEDIUM;
+CREATE TABLE TBL_MEDIUM(
+	ID NUMBER CONSTRAINT PK_MEDIUM PRIMARY KEY,
+	
+);
 
 
+CREATE SEQUENCE SEQ_SMALL;
+CREATE TABLE TBL_SMALL(
+	ID NUMBER CONSTRAINT PK_SMALL PRIMARY KEY,
+	
+);
 
-
-
-
-
-
-
-
+CREATE SEQUENCE SEQ_FORM;
+CREATE TABLE TBL_FORM(
+	ID NUMBER CONSTRAINT PK_FORM PRIMARY KEY,
+	
+);
 
 
 
