@@ -1,6 +1,6 @@
 -- 13) 유저 중 이태희를 태희로 이름 변경
 UPDATE TBL_BUYER 
-SET BUYER_NAME = '태희', BUYER_ADDRESS = '서울시 스카이캐슬'
+SET BUYER_NAME = '태희'
 WHERE BUYER_NAME = '이태희'
 
 SELECT *
